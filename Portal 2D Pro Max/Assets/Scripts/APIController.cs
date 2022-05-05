@@ -47,11 +47,20 @@ public class APIController : MonoBehaviour
 
         
         JSONNode scoreInfo = JSON.Parse(scoreInfoRequest.downloadHandler.text);
-
-        Debug.Log(scoreInfo);
+        JSONObject scoreJson = scoreInfo.AsArray[0].AsObject;
         
-        string userId = scoreInfo["userId"];
-        string score = scoreInfo["score"];
+        Debug.Log(scoreInfo);
+
+
+        string usernameURL = baseAPIUrl + "getUsername/" + scoreJson["userId"];
+        
+        UnityWebRequest getUsernameRequest = UnityWebRequest.Get(usernameURL);
+
+        yield return getUsernameRequest.SendWebRequest();
+        
+        
+        string userId = getUsernameRequest.downloadHandler.text;
+        string score = scoreJson["score"];
         
         Debug.Log(userId);
         Debug.Log(score);

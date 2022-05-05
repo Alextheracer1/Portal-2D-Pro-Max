@@ -8,9 +8,6 @@ public class PortalGun : MonoBehaviour
 {
     private Camera cam;
 
-    public GameObject portal;
-    public Transform pivot;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -24,16 +21,18 @@ public class PortalGun : MonoBehaviour
         {
             Vector2 cursorPos = cam.ScreenToWorldPoint(Input.mousePosition);
             GameObject bluePortal = GameObject.FindGameObjectWithTag("Portal1");
+            GameObject bluePortalClone = bluePortal;
+            
 
-            /*
             if (bluePortal != null)
             {
-                Destroy(bluePortal);
+                Destroy(bluePortal); 
+          
             }
-            */
+            
+            bluePortalClone = this.gameObject;
+            Instantiate(bluePortalClone, new Vector3(cursorPos.x, cursorPos.y, 0), Quaternion.identity);
 
-            Instantiate(portal, new Vector3(cursorPos.x, cursorPos.y, 0), Quaternion.identity);
-            bluePortal = this.gameObject;
         }
     }
 }

@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Portal1
+  - Portal2
+  - Portal3
+  - Portal4
+  - Ground
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Background
+  - Player
+  - Portal Gun
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1625036217
+    locked: 0
+  - name: Particles
+    uniqueID: 2439474805
+    locked: 0
+  - name: Assets
+    uniqueID: 3369696029
+    locked: 0
+  - name: Portals
+    uniqueID: 4193247885
+    locked: 0
+  - name: Player
+    uniqueID: 1490027485
+    locked: 0
+  - name: PortalGun
+    uniqueID: 2848147071
+    locked: 0

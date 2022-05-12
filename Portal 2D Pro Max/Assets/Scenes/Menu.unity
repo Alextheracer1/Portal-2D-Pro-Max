@@ -482,7 +482,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &536268265
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2052,7 +2052,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1727600802
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2407,8 +2407,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0a419b5b735e694a9cb5323137374e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pokeNameText: {fileID: 50991880}
-  pokeNumText: {fileID: 1166437796}
 --- !u!4 &2015797999
 Transform:
   m_ObjectHideFlags: 0

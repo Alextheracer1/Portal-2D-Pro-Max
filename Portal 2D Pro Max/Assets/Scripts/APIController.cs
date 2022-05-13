@@ -16,13 +16,30 @@ public class APIController : MonoBehaviour
     public TMP_InputField usernameInput;
     public TMP_InputField passwordInput;
 
-    private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
+    public TextMeshProUGUI loggedInText;
 
+    private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
+    private readonly string baseLoginText = "Logged in as";
+    
     private void Start()
     {
         usernameText.text = "";
         userScore.text = "";
     }
+
+/*
+    public void CheckLogin()
+    {
+        string loginText;
+        bool loggedin = false;
+        string username = "";
+        
+        if (loggedin)
+        {
+            loginText = loggedInText + username;
+        }
+    }
+  */  
 
     public void OnButtonLogin()
     {

@@ -13,12 +13,40 @@ public class APIController : MonoBehaviour
     public TextMeshProUGUI usernameText;
     public TextMeshProUGUI userScore;
 
-    private readonly string baseAPIUrl = "http://127.0.0.1:8080/"; //TODO: Change to a proper URL later
+    public TMP_InputField usernameInput;
+    public TMP_InputField passwordInput;
 
+    public TextMeshProUGUI loggedInText;
+
+    private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
+    private readonly string baseLoginText = "Logged in as";
+    
     private void Start()
     {
         usernameText.text = "";
         userScore.text = "";
+    }
+
+/*
+    public void CheckLogin()
+    {
+        string loginText;
+        bool loggedin = false;
+        string username = "";
+        
+        if (loggedin)
+        {
+            loginText = loggedInText + username;
+        }
+    }
+  */  
+
+    public void OnButtonLogin()
+    {
+        string username = usernameInput.text;
+        string password = passwordInput.text;
+
+        StartCoroutine(SaveUser(username, password));
     }
 
     public void OnButtonLeaderboard()
@@ -29,11 +57,34 @@ public class APIController : MonoBehaviour
         StartCoroutine(GetScores());
     }
 
+    IEnumerator SaveUser(string username, string password)
+    {
+        string scoreURL = baseAPIUrl + "/saveUser/";
+        
+        Debug.Log("Username: " + username + " Password: " + password);
+        
+        
+        var saveUserPost = new UnityWebRequest(scoreURL, "POST");
+        byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(username + password);
+        saveUserPost.uploadHandler = (UploadHandler)new UploadHandlerRaw(jsonToSend);
+        saveUserPost.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        saveUserPost.SetRequestHeader("Content-Type", "application/json");
+
+        yield return saveUserPost.SendWebRequest();
+
+        if (saveUserPost.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(saveUserPost.error);
+            yield break;
+        }
+        
+    }
+
     IEnumerator GetScores()
     {
-        string scoreURL = baseAPIUrl + "getScores/";
-        
-        
+        string scoreURL = baseAPIUrl + "/getScores/";
+
+
         UnityWebRequest scoreInfoRequest = UnityWebRequest.Get(scoreURL);
 
         yield return scoreInfoRequest.SendWebRequest();
@@ -45,31 +96,27 @@ public class APIController : MonoBehaviour
         }
 
 
-        
+
         JSONNode scoreInfo = JSON.Parse(scoreInfoRequest.downloadHandler.text);
         JSONObject scoreJson = scoreInfo.AsArray[0].AsObject;
-        
+
         Debug.Log(scoreInfo);
 
 
         string usernameURL = baseAPIUrl + "getUsername/" + scoreJson["userId"];
-        
+
         UnityWebRequest getUsernameRequest = UnityWebRequest.Get(usernameURL);
 
         yield return getUsernameRequest.SendWebRequest();
-        
-        
+
+
         string userId = getUsernameRequest.downloadHandler.text;
         string score = scoreJson["score"];
-        
+
         Debug.Log(userId);
         Debug.Log(score);
 
         usernameText.text = userId;
         userScore.text = score;
-        
-       
     }
-    
-    
 }

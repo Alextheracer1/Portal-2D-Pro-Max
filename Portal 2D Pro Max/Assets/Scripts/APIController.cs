@@ -16,20 +16,23 @@ public class APIController : MonoBehaviour
 
     public TMP_InputField usernameInputLogin;
     public TMP_InputField passwordInputLogin;
-    
+
     public TMP_InputField usernameInputRegister;
     public TMP_InputField passwordInputRegister;
 
     public TextMeshProUGUI loggedInText;
 
     private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
-    private readonly string userInformationPath = Application.persistentDataPath + "/CurrentPlayer.txt";
+    private string _userInformationPath;
     private readonly string baseLoginText = "Logged in as";
+    private readonly string baseUUIDTemplate = "UUID: ";
+    private readonly string baseUsernameTemplate = "username: ";
 
     private void Start()
     {
         usernameText.text = "";
         userScore.text = "";
+        _userInformationPath = Application.persistentDataPath + "/CurrentPlayer.txt";
     }
 
     public void Update()
@@ -37,12 +40,27 @@ public class APIController : MonoBehaviour
         CheckLogin();
     }
 
+    private string GetRequest(string url)
+    {
+        string completeUrl = baseAPIUrl + url;
+
+        UnityWebRequest getRequest = UnityWebRequest.Get(completeUrl);
+
+        getRequest.SendWebRequest();
+
+        if (getRequest.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(getRequest.error);
+        }
+
+        string result = getRequest.downloadHandler.text;
+        return result;
+    }
+
 
     private void CheckLogin()
     {
-        
-      
-        string[] readText = File.ReadAllLines(userInformationPath);
+        string[] readText = File.ReadAllLines(_userInformationPath);
 
 
         for (int i = 0; i < readText.Length; i++)
@@ -60,45 +78,42 @@ public class APIController : MonoBehaviour
         string username = usernameInputLogin.text;
         string password = passwordInputLogin.text;
 
-        StartCoroutine(GetUser(username, password));
+        //StartCoroutine(GetUser(username, password));
+
+        //TODO: Get this fixed
+        
+        
+        getUser(username, password);
     }
 
+    private void getUser(string username, string password)
+    {
+        string usernames = GetRequest("/getUsernames");
+        Debug.Log(usernames);
+    }
+
+    /*
     IEnumerator GetUser(string username, string password)
     {
-        string getAllUsernamesURL = baseAPIUrl + "/getUsernames";
-        string usernames;
-        
-        UnityWebRequest getUsernamesRequest = UnityWebRequest.Get(getAllUsernamesURL);
+        string usernames = GetRequest("/getUsernames");
+        yield return new WaitForSeconds(1);
+        Debug.Log(usernames);
 
-        yield return getUsernamesRequest.SendWebRequest();
-
-        if (getUsernamesRequest.result == UnityWebRequest.Result.ConnectionError)
+        if (usernames.Contains(username))
         {
-            Debug.LogError(getUsernamesRequest.error);
-            yield break;
-        }
+            string uuid = GetRequest("/getUserId/" + username);
 
-        usernames = getUsernamesRequest.downloadHandler.text;
-        Debug.Log(getUsernamesRequest.downloadHandler.text);
-
-        if (usernames.Contains(usernameInputLogin.text))
-        {
-            using (StreamWriter writer = new StreamWriter(userInformationPath))
+            using (StreamWriter writer = new StreamWriter(_userInformationPath))
             {
-                writer.WriteLine("UUID: 123489248923748923748932");
-                writer.WriteLine("username: Monica");
-                writer.WriteLine("password: Monica12345");
+                writer.WriteLine(baseUUIDTemplate + uuid);
+                writer.WriteLine(baseUsernameTemplate + username);
             }
-
-            CheckLogin();
         }
 
-        
-        
-        
-        yield break; 
-    }
 
+        yield break;
+    }
+*/
 
     public void OnButtonRegister()
     {

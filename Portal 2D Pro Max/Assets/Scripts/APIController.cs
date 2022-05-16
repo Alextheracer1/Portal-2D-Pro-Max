@@ -40,24 +40,6 @@ public class APIController : MonoBehaviour
         CheckLogin();
     }
 
-    private string GetRequest(string url)
-    {
-        string completeUrl = baseAPIUrl + url;
-
-        UnityWebRequest getRequest = UnityWebRequest.Get(completeUrl);
-
-        getRequest.SendWebRequest();
-
-        if (getRequest.result == UnityWebRequest.Result.ConnectionError)
-        {
-            Debug.LogError(getRequest.error);
-        }
-
-        string result = getRequest.downloadHandler.text;
-        return result;
-    }
-
-
     private void CheckLogin()
     {
         string[] readText = File.ReadAllLines(_userInformationPath);
@@ -78,30 +60,44 @@ public class APIController : MonoBehaviour
         string username = usernameInputLogin.text;
         string password = passwordInputLogin.text;
 
-        //StartCoroutine(GetUser(username, password));
-
-        //TODO: Get this fixed
-        
-        
-        getUser(username, password);
+        StartCoroutine(GetUser(username, password));
     }
 
-    private void getUser(string username, string password)
-    {
-        string usernames = GetRequest("/getUsernames");
-        Debug.Log(usernames);
-    }
-
-    /*
     IEnumerator GetUser(string username, string password)
     {
-        string usernames = GetRequest("/getUsernames");
-        yield return new WaitForSeconds(1);
-        Debug.Log(usernames);
+        // Tries to get all the Usernames
+        string usernameURL = baseAPIUrl + "/getUsernames";
+        
+        UnityWebRequest usernamesRequest = UnityWebRequest.Get(usernameURL);
 
+        yield return usernamesRequest.SendWebRequest();
+
+        if (usernamesRequest.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(usernamesRequest.error);
+            yield break;
+        }
+
+        string usernames = usernamesRequest.downloadHandler.text;
+
+
+        // Searches if the username is in the Database
         if (usernames.Contains(username))
         {
-            string uuid = GetRequest("/getUserId/" + username);
+            // Tries to get the UUID
+            string uuidUrl = baseAPIUrl + "/getUserId/" + username;
+
+            UnityWebRequest uuidRequest = UnityWebRequest.Get(uuidUrl);
+
+            yield return uuidRequest.SendWebRequest();
+
+            if (uuidRequest.result == UnityWebRequest.Result.ConnectionError)
+            {
+                Debug.LogError(uuidRequest.error);
+                yield break;
+            }
+
+            string uuid = uuidRequest.downloadHandler.text;
 
             using (StreamWriter writer = new StreamWriter(_userInformationPath))
             {
@@ -113,7 +109,7 @@ public class APIController : MonoBehaviour
 
         yield break;
     }
-*/
+
 
     public void OnButtonRegister()
     {

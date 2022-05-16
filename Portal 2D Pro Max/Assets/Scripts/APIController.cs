@@ -16,10 +16,7 @@ public class APIController : MonoBehaviour
 
     public TMP_InputField usernameInputLogin;
     public TMP_InputField passwordInputLogin;
-
-    public TMP_InputField usernameInputRegister;
-    public TMP_InputField passwordInputRegister;
-
+    
     public TextMeshProUGUI loggedInText;
 
     private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
@@ -98,6 +95,22 @@ public class APIController : MonoBehaviour
             }
 
             string uuid = uuidRequest.downloadHandler.text;
+            
+            string passwordURL = baseAPIUrl + "/getPassword/" + uuid;
+
+            UnityWebRequest passwordRequest = UnityWebRequest.Get(passwordURL);
+
+            yield return passwordRequest.SendWebRequest();
+
+            if (passwordRequest.result == UnityWebRequest.Result.ConnectionError)
+            {
+                Debug.LogError(passwordRequest.error);
+                yield break;
+            }
+
+            string userDatabasePassword = passwordRequest.downloadHandler.text;
+            
+            Debug.Log(userDatabasePassword);
 
             using (StreamWriter writer = new StreamWriter(_userInformationPath))
             {
@@ -108,37 +121,6 @@ public class APIController : MonoBehaviour
 
 
         yield break;
-    }
-
-
-    public void OnButtonRegister()
-    {
-        string username = usernameInputRegister.text;
-        string password = passwordInputRegister.text;
-
-        StartCoroutine(SaveUser(username, password));
-    }
-
-    IEnumerator SaveUser(string username, string password)
-    {
-        string scoreURL = baseAPIUrl + "/saveUser/";
-
-        Debug.Log("Username: " + username + " Password: " + password);
-
-
-        var saveUserPost = new UnityWebRequest(scoreURL, "POST");
-        byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(username + password);
-        saveUserPost.uploadHandler = (UploadHandler) new UploadHandlerRaw(jsonToSend);
-        saveUserPost.downloadHandler = (DownloadHandler) new DownloadHandlerBuffer();
-        saveUserPost.SetRequestHeader("Content-Type", "application/json");
-
-        yield return saveUserPost.SendWebRequest();
-
-        if (saveUserPost.result == UnityWebRequest.Result.ConnectionError)
-        {
-            Debug.LogError(saveUserPost.error);
-            yield break;
-        }
     }
 
     public void OnButtonLeaderboard()

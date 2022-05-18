@@ -98,7 +98,7 @@ namespace TMPro.Examples
                     // Free Camera implementation
                 }
 
-                if (MovementSmoothing == true)
+                if (MovementSmoothing)
                 {
                     // Using Smoothing
                     cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, desiredPosition, ref currentVelocity, MovementSmoothingValue * Time.fixedDeltaTime);
@@ -110,7 +110,7 @@ namespace TMPro.Examples
                     cameraTransform.position = desiredPosition;
                 }
 
-                if (RotationSmoothing == true)
+                if (RotationSmoothing)
                     cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, Quaternion.LookRotation(CameraTarget.position - cameraTransform.position), RotationSmoothingValue * Time.deltaTime);
                 else
                 {

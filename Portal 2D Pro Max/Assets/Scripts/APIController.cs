@@ -16,8 +16,11 @@ public class APIController : MonoBehaviour
 
     public TMP_InputField usernameInputLogin;
     public TMP_InputField passwordInputLogin;
-    
+
     public TextMeshProUGUI loggedInText;
+
+    public GameObject mainMenu;
+    public GameObject loginMenu;
 
     private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
     private string _userInformationPath;
@@ -34,10 +37,10 @@ public class APIController : MonoBehaviour
 
     public void Update()
     {
-        CheckLogin();
+        CheckFile();
     }
 
-    private void CheckLogin()
+    private void CheckFile()
     {
         string[] readText = File.ReadAllLines(_userInformationPath);
 
@@ -62,61 +65,61 @@ public class APIController : MonoBehaviour
 
     IEnumerator GetUser(string username, string password)
     {
-        // Tries to get all the Usernames
-        string usernameURL = baseAPIUrl + "/getUsernames";
-        
-        UnityWebRequest usernamesRequest = UnityWebRequest.Get(usernameURL);
+        string checkLoginURL = baseAPIUrl + "/checkLogin/" + username + "/" + password;
 
-        yield return usernamesRequest.SendWebRequest();
+        UnityWebRequest checkLoginRequest = UnityWebRequest.Post(checkLoginURL, "");
 
-        if (usernamesRequest.result == UnityWebRequest.Result.ConnectionError)
+        yield return checkLoginRequest.SendWebRequest();
+
+        if (checkLoginRequest.result == UnityWebRequest.Result.ConnectionError)
         {
-            Debug.LogError(usernamesRequest.error);
+            Debug.LogError(checkLoginRequest.error);
             yield break;
         }
 
-        string usernames = usernamesRequest.downloadHandler.text;
+        Debug.Log("Result: " + checkLoginRequest.result);
+        Debug.Log("ResponseCode: " + checkLoginRequest.responseCode);
 
 
-        // Searches if the username is in the Database
-        if (usernames.Contains(username))
+        if (username != "" && password != "")
         {
-            // Tries to get the UUID
-            string uuidUrl = baseAPIUrl + "/getUserId/" + username;
-
-            UnityWebRequest uuidRequest = UnityWebRequest.Get(uuidUrl);
-
-            yield return uuidRequest.SendWebRequest();
-
-            if (uuidRequest.result == UnityWebRequest.Result.ConnectionError)
+            if (checkLoginRequest.responseCode == 200)
             {
-                Debug.LogError(uuidRequest.error);
-                yield break;
+                string getUuidURL = baseAPIUrl + "/getUserId/" + username;
+
+                UnityWebRequest getUuidRequest = UnityWebRequest.Get(getUuidURL);
+
+                yield return getUuidRequest.SendWebRequest();
+
+                if (getUuidRequest.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    Debug.LogError(getUuidRequest.error);
+                    yield break;
+                }
+
+                string uuid = getUuidRequest.downloadHandler.text;
+
+                using (StreamWriter writer = new StreamWriter(_userInformationPath))
+                {
+                    writer.WriteLine(baseUUIDTemplate + uuid);
+                    writer.WriteLine(baseUsernameTemplate + username);
+                }
+
+                Debug.Log("Login successful");
+
+                usernameInputLogin.text = "";
+                passwordInputLogin.text = "";
+                mainMenu.gameObject.SetActive(true);
+                loginMenu.gameObject.SetActive(false);
             }
-
-            string uuid = uuidRequest.downloadHandler.text;
-            
-            string passwordURL = baseAPIUrl + "/getPassword/" + uuid;
-
-            UnityWebRequest passwordRequest = UnityWebRequest.Get(passwordURL);
-
-            yield return passwordRequest.SendWebRequest();
-
-            if (passwordRequest.result == UnityWebRequest.Result.ConnectionError)
+            else if (checkLoginRequest.responseCode == 400)
             {
-                Debug.LogError(passwordRequest.error);
-                yield break;
+                Debug.Log("Invalid Credentials");
             }
-
-            string userDatabasePassword = passwordRequest.downloadHandler.text;
-            
-            Debug.Log(userDatabasePassword);
-
-            using (StreamWriter writer = new StreamWriter(_userInformationPath))
-            {
-                writer.WriteLine(baseUUIDTemplate + uuid);
-                writer.WriteLine(baseUsernameTemplate + username);
-            }
+        }
+        else
+        {
+            Debug.LogError("Username and/or Password empty");
         }
 
 

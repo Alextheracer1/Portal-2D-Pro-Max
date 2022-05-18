@@ -940,7 +940,7 @@ namespace SimpleJSON
         {
             try
             {
-                var item = m_Dict.Where(k => k.Value == aNode).First();
+                var item = m_Dict.First(k => k.Value == aNode);
                 m_Dict.Remove(item.Key);
                 return aNode;
             }

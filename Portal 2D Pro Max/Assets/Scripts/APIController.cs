@@ -22,21 +22,21 @@ public class APIController : MonoBehaviour
     public GameObject mainMenu;
     public GameObject loginMenu;
 
+    public Button loginButton;
+    public Button logoutButton;
+
     private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
     private string _userInformationPath;
     private readonly string baseLoginText = "Logged in as";
     private readonly string baseUUIDTemplate = "UUID: ";
     private readonly string baseUsernameTemplate = "username: ";
 
+
     private void Start()
     {
         usernameText.text = "";
         userScore.text = "";
         _userInformationPath = Application.persistentDataPath + "/CurrentPlayer.txt";
-    }
-
-    public void Update()
-    {
         CheckFile();
     }
 
@@ -51,8 +51,26 @@ public class APIController : MonoBehaviour
             {
                 string username = readText[i].Replace("username:", "");
                 loggedInText.SetText(baseLoginText + username);
+                loginButton.gameObject.SetActive(false);
+                logoutButton.gameObject.SetActive(true);
+            }
+            else
+            {
+                loginButton.gameObject.SetActive(true);
+                logoutButton.gameObject.SetActive(false);
             }
         }
+    }
+
+    public void OnButtonLogout()
+    {
+        using (StreamWriter writer = new StreamWriter(_userInformationPath))
+        {
+            writer.WriteLine("empty lol");
+        }
+        loginButton.gameObject.SetActive(true);
+        logoutButton.gameObject.SetActive(false);
+        loggedInText.text = "";
     }
 
     public void OnButtonLogin()
@@ -111,6 +129,9 @@ public class APIController : MonoBehaviour
                 passwordInputLogin.text = "";
                 mainMenu.gameObject.SetActive(true);
                 loginMenu.gameObject.SetActive(false);
+                loginButton.gameObject.SetActive(false);
+                logoutButton.gameObject.SetActive(true);
+                CheckFile();
             }
             else if (checkLoginRequest.responseCode == 400)
             {

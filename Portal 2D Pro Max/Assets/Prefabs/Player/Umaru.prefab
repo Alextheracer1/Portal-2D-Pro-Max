@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  jumpForce: 200
+  jumpForce: 400
   maxSpeed: 12
 --- !u!70 &6532899138409423994
 CapsuleCollider2D:

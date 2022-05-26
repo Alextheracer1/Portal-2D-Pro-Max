@@ -22,17 +22,13 @@ public class PlayerMovement : MonoBehaviour
         didJump = false;
         isJumping = false;
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    void FixedUpdate()
     {
         moveHorizontal = Input.GetAxisRaw("Horizontal");
         moveVertical = Input.GetAxisRaw("Vertical");
-        rigidbody2D.velocity = Vector3.ClampMagnitude(rigidbody2D.velocity, maxSpeed);
-    }
 
-    void FixedUpdate()
-    {
+        rigidbody2D.velocity = Vector3.ClampMagnitude(rigidbody2D.velocity, maxSpeed);
         if (moveHorizontal > 0.1f || moveHorizontal < -0.1f)
         {
             rigidbody2D.AddForce(new Vector2(moveHorizontal * moveSpeed, 0f), ForceMode2D.Impulse);

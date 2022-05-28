@@ -8,10 +8,10 @@ using UnityEngine.Networking;
 using SimpleJSON;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class APIController : MonoBehaviour
 {
-    public TextMeshProUGUI usernameText;
     public TextMeshProUGUI userScore;
 
     public TMP_InputField usernameInputLogin;
@@ -34,7 +34,6 @@ public class APIController : MonoBehaviour
 
     private void Start()
     {
-        usernameText.text = "";
         userScore.text = "";
         _userInformationPath = Application.persistentDataPath + "/CurrentPlayer.txt";
         CheckFile();
@@ -62,12 +61,23 @@ public class APIController : MonoBehaviour
         }
     }
 
+    public void OnButtonTry()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3, LoadSceneMode.Single);
+    }
+
+    public void OnButtonTryYourLuck()
+    {
+        StartCoroutine(GetCurrentScore());
+    }
+
     public void OnButtonLogout()
     {
         using (StreamWriter writer = new StreamWriter(_userInformationPath))
         {
             writer.WriteLine("empty lol");
         }
+
         loginButton.gameObject.SetActive(true);
         logoutButton.gameObject.SetActive(false);
         loggedInText.text = "";
@@ -147,18 +157,27 @@ public class APIController : MonoBehaviour
         yield break;
     }
 
-    public void OnButtonLeaderboard()
+
+    IEnumerator GetCurrentScore()
     {
-        usernameText.text = "Loading...";
-        userScore.text = "Loading...";
+        string scoreURL = baseAPIUrl + "/getScore/";
 
-        StartCoroutine(GetScores());
-    }
+        string[] readText = File.ReadAllLines(_userInformationPath);
 
-    IEnumerator GetScores()
-    {
-        string scoreURL = baseAPIUrl + "/getScores/";
-
+        for (int i = 0; i < readText.Length; i++)
+        {
+            if (readText[i].Contains("UUID: "))
+            {
+                string uuid = readText[i].Replace("UUID: ", "");
+                scoreURL += uuid;
+                break;
+            }
+            else
+            {
+                userScore.text = "0";
+                yield break;
+            }
+        }
 
         UnityWebRequest scoreInfoRequest = UnityWebRequest.Get(scoreURL);
 
@@ -170,27 +189,12 @@ public class APIController : MonoBehaviour
             yield break;
         }
 
+        var rawScore = scoreInfoRequest.downloadHandler.text;
 
-        JSONNode scoreInfo = JSON.Parse(scoreInfoRequest.downloadHandler.text);
-        JSONObject scoreJson = scoreInfo.AsArray[0].AsObject;
+        //remove [] from string
+        string result = rawScore.Remove(rawScore.Length - 1);
+        result = result.Remove(0, 1);
 
-        Debug.Log(scoreInfo);
-
-
-        string usernameURL = baseAPIUrl + "getUsername/" + scoreJson["userId"];
-
-        UnityWebRequest getUsernameRequest = UnityWebRequest.Get(usernameURL);
-
-        yield return getUsernameRequest.SendWebRequest();
-
-
-        string userId = getUsernameRequest.downloadHandler.text;
-        string score = scoreJson["score"];
-
-        Debug.Log(userId);
-        Debug.Log(score);
-
-        usernameText.text = userId;
-        userScore.text = score;
+        userScore.text = result;
     }
 }

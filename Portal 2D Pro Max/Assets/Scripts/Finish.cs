@@ -29,6 +29,10 @@ public class Finish : MonoBehaviour
             StopScoreCalculation();
             StartCoroutine(SaveScore());
         }
+        else if (currentScene == 2)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex * 0);
+        }
         else
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1, LoadSceneMode.Single);

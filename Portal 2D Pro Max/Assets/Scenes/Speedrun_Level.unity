@@ -591,6 +591,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1410454938675042756, guid: ad00a25a25a286743a0c3edc49d35250, type: 3}
+      propertyPath: baseScore
+      value: 10000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410454938675042756, guid: ad00a25a25a286743a0c3edc49d35250, type: 3}
       propertyPath: countScore
       value: 1
       objectReference: {fileID: 0}

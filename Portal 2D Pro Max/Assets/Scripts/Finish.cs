@@ -12,6 +12,7 @@ public class Finish : MonoBehaviour
     public bool countScore;
     private int _score;
     public float multiplier;
+    public int baseScore = 10000;
 
 
     private void StopScoreCalculation()
@@ -46,12 +47,20 @@ public class Finish : MonoBehaviour
             _currentTime += Time.smoothDeltaTime;
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
-                _currentTime -= 2;
+                _currentTime += 5;
             }
         }
 
+
         _score = Mathf.RoundToInt(_currentTime * multiplier);
-        //Debug.Log("Current Score: " + _score);
+        _score = baseScore - _score;
+
+        if (_score < 0)
+        {
+            _score = 0;
+        }
+
+        Debug.Log("Current Score: " + _score);
     }
 
 

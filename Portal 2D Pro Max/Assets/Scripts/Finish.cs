@@ -57,7 +57,7 @@ public class Finish : MonoBehaviour
 
     IEnumerator SaveScore()
     {
-        string saveScoreURL = "localhost:8080/api/saveScore/";
+        string saveScoreURL = "https://portal-2d-pro-max-backend.herokuapp.com/api/saveScore/";
 
         string[] readText = File.ReadAllLines(Application.persistentDataPath + "/CurrentPlayer.txt");
         for (int i = 0; i < readText.Length; i++)

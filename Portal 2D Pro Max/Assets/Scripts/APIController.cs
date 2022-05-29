@@ -31,7 +31,7 @@ public class APIController : MonoBehaviour
 
     private bool _loggedIn;
 
-    private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
+    private readonly string baseAPIUrl = "https://portal-2d-pro-max-backend.herokuapp.com/api";
     private string _userInformationPath;
     private readonly string baseLoginText = "Logged in as";
     private readonly string baseUUIDTemplate = "UUID: ";

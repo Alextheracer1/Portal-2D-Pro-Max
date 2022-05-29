@@ -18,6 +18,8 @@ public class APIController : MonoBehaviour
 
     public TextMeshProUGUI loggedInText;
     public TextMeshProUGUI errorMessageText;
+    public TextMeshProUGUI errorMessageTextLogin;
+    public TextMeshProUGUI errorMessageTextRegister;
 
     public GameObject mainMenu;
     public GameObject loginMenu;
@@ -117,6 +119,10 @@ public class APIController : MonoBehaviour
         {
             StartCoroutine(GetUser(username, password));
         }
+        else
+        {
+            errorMessageTextLogin.SetText("Please fill in both fields!");
+        }
     }
 
 
@@ -127,7 +133,10 @@ public class APIController : MonoBehaviour
         if (username != "" && password != "")
         {
             StartCoroutine(RegisterUser(username, password));
-            StartCoroutine(GetUser(username, password));
+        }
+        else
+        {
+            errorMessageTextRegister.SetText("Please fill in both fields!");
         }
     }
 
@@ -141,12 +150,22 @@ public class APIController : MonoBehaviour
 
         if (checkLoginRequest.result == UnityWebRequest.Result.ConnectionError)
         {
+            errorMessageTextRegister.SetText("Error Registering User! Check your Internet Connection!");
             Debug.LogError(checkLoginRequest.error);
             yield break;
         }
+
+        if (checkLoginRequest.responseCode == 400)
+        {
+            errorMessageTextRegister.text = "Username already taken!";
+            yield break;
+        }
+        
+        StartCoroutine(GetUser(username, password));
         
         usernameInputRegister.text = "";
         passwordInputRegister.text = "";
+        errorMessageTextRegister.text = "";
     }
 
 
@@ -160,6 +179,7 @@ public class APIController : MonoBehaviour
 
         if (checkLoginRequest.result == UnityWebRequest.Result.ConnectionError)
         {
+            errorMessageTextLogin.SetText("Error checking Login! Check your Internet Connection!");
             Debug.LogError(checkLoginRequest.error);
             yield break;
         }
@@ -178,6 +198,7 @@ public class APIController : MonoBehaviour
 
             if (getUuidRequest.result == UnityWebRequest.Result.ConnectionError)
             {
+                errorMessageTextLogin.SetText("Error checking Login! Check your Internet Connection!");
                 Debug.LogError(getUuidRequest.error);
                 yield break;
             }
@@ -194,6 +215,7 @@ public class APIController : MonoBehaviour
 
             usernameInputLogin.text = "";
             passwordInputLogin.text = "";
+            errorMessageTextLogin.text = "";
             mainMenu.gameObject.SetActive(true);
             loginMenu.gameObject.SetActive(false);
             loginButton.gameObject.SetActive(false);
@@ -205,6 +227,7 @@ public class APIController : MonoBehaviour
         else if (checkLoginRequest.responseCode == 400)
         {
             Debug.Log("Invalid Credentials");
+            errorMessageTextLogin.SetText("Invalid Credentials");
         }
     }
 

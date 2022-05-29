@@ -13,6 +13,8 @@ public class APIController : MonoBehaviour
 
     public TMP_InputField usernameInputLogin;
     public TMP_InputField passwordInputLogin;
+    public TMP_InputField usernameInputRegister;
+    public TMP_InputField passwordInputRegister;
 
     public TextMeshProUGUI loggedInText;
     public TextMeshProUGUI errorMessageText;
@@ -20,6 +22,7 @@ public class APIController : MonoBehaviour
     public GameObject mainMenu;
     public GameObject loginMenu;
     public GameObject tryYourLuckMenu;
+    public GameObject registerMenu;
 
     public Button loginButton;
     public Button logoutButton;
@@ -72,6 +75,7 @@ public class APIController : MonoBehaviour
         }
     }
 
+
     public void OnButtonTry()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3, LoadSceneMode.Single);
@@ -109,8 +113,42 @@ public class APIController : MonoBehaviour
         string username = usernameInputLogin.text;
         string password = passwordInputLogin.text;
 
-        StartCoroutine(GetUser(username, password));
+        if (username != "" && password != "")
+        {
+            StartCoroutine(GetUser(username, password));
+        }
     }
+
+
+    public void OnButtonRegister()
+    {
+        String username = usernameInputRegister.text;
+        String password = passwordInputRegister.text;
+        if (username != "" && password != "")
+        {
+            StartCoroutine(RegisterUser(username, password));
+            StartCoroutine(GetUser(username, password));
+        }
+    }
+
+    IEnumerator RegisterUser(String username, String password)
+    {
+        string registerUrl = baseAPIUrl + "/saveUser?username=" + username + "&password=" + password;
+
+        UnityWebRequest checkLoginRequest = UnityWebRequest.Post(registerUrl, "");
+
+        yield return checkLoginRequest.SendWebRequest();
+
+        if (checkLoginRequest.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(checkLoginRequest.error);
+            yield break;
+        }
+        
+        usernameInputRegister.text = "";
+        passwordInputRegister.text = "";
+    }
+
 
     IEnumerator GetUser(string username, string password)
     {
@@ -130,49 +168,43 @@ public class APIController : MonoBehaviour
         Debug.Log("ResponseCode: " + checkLoginRequest.responseCode);
 
 
-        if (username != "" && password != "")
+        if (checkLoginRequest.responseCode == 200)
         {
-            if (checkLoginRequest.responseCode == 200)
+            string getUuidURL = baseAPIUrl + "/getUserId/" + username;
+
+            UnityWebRequest getUuidRequest = UnityWebRequest.Get(getUuidURL);
+
+            yield return getUuidRequest.SendWebRequest();
+
+            if (getUuidRequest.result == UnityWebRequest.Result.ConnectionError)
             {
-                string getUuidURL = baseAPIUrl + "/getUserId/" + username;
-
-                UnityWebRequest getUuidRequest = UnityWebRequest.Get(getUuidURL);
-
-                yield return getUuidRequest.SendWebRequest();
-
-                if (getUuidRequest.result == UnityWebRequest.Result.ConnectionError)
-                {
-                    Debug.LogError(getUuidRequest.error);
-                    yield break;
-                }
-
-                string uuid = getUuidRequest.downloadHandler.text;
-
-                using (StreamWriter writer = new StreamWriter(_userInformationPath))
-                {
-                    writer.WriteLine(baseUUIDTemplate + uuid);
-                    writer.WriteLine(baseUsernameTemplate + username);
-                }
-
-                Debug.Log("Login successful");
-
-                usernameInputLogin.text = "";
-                passwordInputLogin.text = "";
-                mainMenu.gameObject.SetActive(true);
-                loginMenu.gameObject.SetActive(false);
-                loginButton.gameObject.SetActive(false);
-                logoutButton.gameObject.SetActive(true);
-                ClearErrorMessageText();
-                CheckFile();
+                Debug.LogError(getUuidRequest.error);
+                yield break;
             }
-            else if (checkLoginRequest.responseCode == 400)
+
+            string uuid = getUuidRequest.downloadHandler.text;
+
+            using (StreamWriter writer = new StreamWriter(_userInformationPath))
             {
-                Debug.Log("Invalid Credentials");
+                writer.WriteLine(baseUUIDTemplate + uuid);
+                writer.WriteLine(baseUsernameTemplate + username);
             }
+
+            Debug.Log("Login successful");
+
+            usernameInputLogin.text = "";
+            passwordInputLogin.text = "";
+            mainMenu.gameObject.SetActive(true);
+            loginMenu.gameObject.SetActive(false);
+            loginButton.gameObject.SetActive(false);
+            logoutButton.gameObject.SetActive(true);
+            registerMenu.gameObject.SetActive(false);
+            ClearErrorMessageText();
+            CheckFile();
         }
-        else
+        else if (checkLoginRequest.responseCode == 400)
         {
-            Debug.LogError("Username and/or Password empty");
+            Debug.Log("Invalid Credentials");
         }
     }
 

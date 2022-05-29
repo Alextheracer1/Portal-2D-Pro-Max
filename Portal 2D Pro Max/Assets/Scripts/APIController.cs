@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Networking;
-using SimpleJSON;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -18,12 +15,16 @@ public class APIController : MonoBehaviour
     public TMP_InputField passwordInputLogin;
 
     public TextMeshProUGUI loggedInText;
+    public TextMeshProUGUI errorMessageText;
 
     public GameObject mainMenu;
     public GameObject loginMenu;
+    public GameObject tryYourLuckMenu;
 
     public Button loginButton;
     public Button logoutButton;
+
+    private bool _loggedIn;
 
     private readonly string baseAPIUrl = "http://127.0.0.1:8080/api"; //TODO: Change to a proper URL later
     private string _userInformationPath;
@@ -35,8 +36,14 @@ public class APIController : MonoBehaviour
     private void Start()
     {
         userScore.text = "";
+        errorMessageText.text = "";
         _userInformationPath = Application.persistentDataPath + "/CurrentPlayer.txt";
         CheckFile();
+    }
+
+    private void ClearErrorMessageText()
+    {
+        errorMessageText.text = "";
     }
 
     private void CheckFile()
@@ -52,11 +59,15 @@ public class APIController : MonoBehaviour
                 loggedInText.SetText(baseLoginText + username);
                 loginButton.gameObject.SetActive(false);
                 logoutButton.gameObject.SetActive(true);
+                Debug.Log("Logged in as " + username);
+                ClearErrorMessageText();
+                _loggedIn = true;
             }
             else
             {
                 loginButton.gameObject.SetActive(true);
                 logoutButton.gameObject.SetActive(false);
+                _loggedIn = false;
             }
         }
     }
@@ -68,7 +79,16 @@ public class APIController : MonoBehaviour
 
     public void OnButtonTryYourLuck()
     {
-        StartCoroutine(GetCurrentScore());
+        if (_loggedIn)
+        {
+            StartCoroutine(GetCurrentScore());
+            mainMenu.gameObject.SetActive(false);
+            tryYourLuckMenu.gameObject.SetActive(true);
+        }
+        else
+        {
+            errorMessageText.SetText("You need to be logged in to Try Your Luck!");
+        }
     }
 
     public void OnButtonLogout()
@@ -80,6 +100,7 @@ public class APIController : MonoBehaviour
 
         loginButton.gameObject.SetActive(true);
         logoutButton.gameObject.SetActive(false);
+        _loggedIn = false;
         loggedInText.text = "";
     }
 
@@ -141,6 +162,7 @@ public class APIController : MonoBehaviour
                 loginMenu.gameObject.SetActive(false);
                 loginButton.gameObject.SetActive(false);
                 logoutButton.gameObject.SetActive(true);
+                ClearErrorMessageText();
                 CheckFile();
             }
             else if (checkLoginRequest.responseCode == 400)
@@ -152,9 +174,6 @@ public class APIController : MonoBehaviour
         {
             Debug.LogError("Username and/or Password empty");
         }
-
-
-        yield break;
     }
 
 
@@ -186,6 +205,7 @@ public class APIController : MonoBehaviour
         if (scoreInfoRequest.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.LogError(scoreInfoRequest.error);
+            userScore.text = "0";
             yield break;
         }
 
@@ -195,6 +215,15 @@ public class APIController : MonoBehaviour
         string result = rawScore.Remove(rawScore.Length - 1);
         result = result.Remove(0, 1);
 
-        userScore.text = result;
+        try
+        {
+            Int32.Parse(result);
+            userScore.text = result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            userScore.text = "0";
+        }
     }
 }

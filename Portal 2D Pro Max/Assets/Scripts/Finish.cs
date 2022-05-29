@@ -11,7 +11,7 @@ public class Finish : MonoBehaviour
     private float _currentTime;
     public bool countScore;
     private int _score;
-    public float multiplier = 5;
+    public float multiplier;
 
 
     private void StopScoreCalculation()
@@ -37,14 +37,13 @@ public class Finish : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(1))
-        {
-            _currentTime += multiplier;
-        }
-
         if (countScore)
         {
-            _currentTime += Time.deltaTime;
+            _currentTime += Time.smoothDeltaTime;
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+            {
+                _currentTime -= 2;
+            }
         }
 
         _score = Mathf.RoundToInt(_currentTime * multiplier);

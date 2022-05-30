@@ -42,6 +42,12 @@ public class Finish : MonoBehaviour
 
     void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex * 0, LoadSceneMode.Single);
+        }
+        
         if (countScore)
         {
             _currentTime += Time.smoothDeltaTime;
@@ -60,7 +66,7 @@ public class Finish : MonoBehaviour
             _score = 0;
         }
 
-        Debug.Log("Current Score: " + _score);
+        //Debug.Log("Current Score: " + _score);
     }
 
 

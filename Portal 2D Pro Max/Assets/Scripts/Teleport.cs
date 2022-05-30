@@ -9,7 +9,7 @@ public class Teleport : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.gameObject.transform.position = new Vector3(0, 0, 0);
+            other.gameObject.transform.position = new Vector3(-9, 0, 0);
         }
     }
     

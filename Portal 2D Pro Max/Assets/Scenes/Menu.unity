@@ -4373,8 +4373,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 521.5613, y: 289.438}
-  m_SizeDelta: {x: 1313.1151, y: 741.5627}
+  m_AnchoredPosition: {x: 525, y: 296}
+  m_SizeDelta: {x: 1319.423, y: 663.7677}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1450326744
 GameObject:
@@ -4563,7 +4563,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 356.68207
+  orthographic size: 329.67822
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
